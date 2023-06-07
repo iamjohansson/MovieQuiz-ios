@@ -1,5 +1,30 @@
 import UIKit
 
+private struct QuizQuestion {
+    //Строка с неймом фильма
+    let image: String
+    //Строка с вопросом о рейтинге
+    let text: String
+    //Булевое значение, правильный ли ответ
+    let correctAnswer: Bool
+}
+private struct QuizStepViewModel {
+    // картинка с афишей фильма
+    let image: UIImage
+    // вопрос о рейтинге квиза
+    let question: String
+    // строка с порядковым номером этого вопроса (пр. 1/10)
+    let questionNumber: String
+}
+private struct QuizResultsViewModel {
+    // строка с заголовком алерта
+    let title: String
+    // строка с текстом о количестве набранных очков
+    let text: String
+    // текст для кнопки алерта
+    let buttonText: String
+}
+
 final class MovieQuizViewController: UIViewController {
     // MARK: - Lifecycle
     
@@ -9,42 +34,23 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private weak var noButton: UIButton!
     @IBOutlet private weak var yesButton: UIButton!
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         imageView.layer.cornerRadius = 20
         newQuestion()
-        }
-    
-    private struct QuizQuestion {
-        //Строка с неймом фильма
-        let image: String
-        //Строка с вопросом о рейтинге
-        let text: String
-        //Булевое значение, правильный ли ответ
-        let correctAnswer: Bool
+        feedbackGenerator = UINotificationFeedbackGenerator()
     }
-    private struct QuizStepViewModel {
-      // картинка с афишей фильма
-      let image: UIImage
-      // вопрос о рейтинге квиза
-      let question: String
-      // строка с порядковым номером этого вопроса (пр. 1/10)
-      let questionNumber: String
-    }
-    private struct QuizResultsViewModel {
-      // строка с заголовком алерта
-      let title: String
-      // строка с текстом о количестве набранных очков
-      let text: String
-      // текст для кнопки алерта
-      let buttonText: String
-    }
-    
+    //переменная с генеротором, для тактильного отклика
+    var feedbackGenerator: UINotificationFeedbackGenerator?
     //переменная с индексом вопроса
     private var currentQuestionIndex = 0
     //переменная со счетчиком верных ответов
     private var correctAnswer = 0
-
+    
     private let questions: [QuizQuestion] = [
         QuizQuestion(image: "The Godfather", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: true),
         QuizQuestion(image: "The Dark Knight", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: true),
@@ -56,7 +62,7 @@ final class MovieQuizViewController: UIViewController {
         QuizQuestion(image: "The Ice Age Adventures of Buck Wild", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false),
         QuizQuestion(image: "Tesla", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false),
         QuizQuestion(image: "Vivarium", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false)
-        ]
+    ]
     
     private func newQuestion() {
         let currentQuestion = questions[currentQuestionIndex]
@@ -76,22 +82,28 @@ final class MovieQuizViewController: UIViewController {
     private func showAnswerResult(isCorrect: Bool) {
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
-        noButton.isEnabled = false
-        yesButton.isEnabled = false
+        buttonEnable()
         if questions[currentQuestionIndex].correctAnswer == isCorrect {
             imageView.layer.borderColor = UIColor.ypGreen.cgColor
             correctAnswer += 1
-            print("Верно!")
         } else {
             imageView.layer.borderColor = UIColor.ypRed.cgColor
-            print("Неверно")
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.showNextQuestionOrResult()
             self.imageView.layer.borderWidth = 0
-            self.noButton.isEnabled = true
-            self.yesButton.isEnabled = true
-            }
+            self.buttonEnable()
+        }
+    }
+    // Метод для блокировки кнопок, при ожидании перехода к след. вопросу
+    private func buttonEnable() {
+        if imageView.layer.borderWidth >= 1 {
+            noButton.isEnabled = false
+            yesButton.isEnabled = false
+        } else {
+            noButton.isEnabled = true
+            yesButton.isEnabled = true
+        }
     }
     // Метод перехода к некст вопросу или алерт с результатом
     private func showNextQuestionOrResult() {
@@ -119,72 +131,10 @@ final class MovieQuizViewController: UIViewController {
     
     @IBAction private func yesButtonClicked(_ sender: Any) {
         showAnswerResult(isCorrect: true)
+        feedbackGenerator?.notificationOccurred(.success)
     }
     @IBAction private func noButtonClicked(_ sender: Any) {
         showAnswerResult(isCorrect: false)
+        feedbackGenerator?.notificationOccurred(.success)
     }
 }
-
-/*
- Mock-данные
- 
- 
- Картинка: The Godfather
- Настоящий рейтинг: 9,2
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
-
-
- Картинка: The Dark Knight
- Настоящий рейтинг: 9
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
-
-
- Картинка: Kill Bill
- Настоящий рейтинг: 8,1
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
-
-
- Картинка: The Avengers
- Настоящий рейтинг: 8
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
-
-
- Картинка: Deadpool
- Настоящий рейтинг: 8
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
-
-
- Картинка: The Green Knight
- Настоящий рейтинг: 6,6
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
-
-
- Картинка: Old
- Настоящий рейтинг: 5,8
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: НЕТ
-
-
- Картинка: The Ice Age Adventures of Buck Wild
- Настоящий рейтинг: 4,3
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: НЕТ
-
-
- Картинка: Tesla
- Настоящий рейтинг: 5,1
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: НЕТ
-
-
- Картинка: Vivarium
- Настоящий рейтинг: 5,8
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: НЕТ
- */
