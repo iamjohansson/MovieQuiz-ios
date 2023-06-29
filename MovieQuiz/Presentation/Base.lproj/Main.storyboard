@@ -52,7 +52,7 @@
                                             <constraint firstAttribute="width" secondItem="WRb-eS-FgC" secondAttribute="height" multiplier="2:3" id="LdE-Li-rZZ"/>
                                         </constraints>
                                     </imageView>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Рейтинг этого фильма меньше, чем 5?" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Uo-8w-MYW" userLabel="Question Label">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Рейтинг этого фильма меньше чем 5?" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Uo-8w-MYW" userLabel="Question Label">
                                         <rect key="frame" x="0.0" y="624.5" width="374" height="99.5"/>
                                         <fontDescription key="fontDescription" name="YSDisplay-Bold" family="YS Display" pointSize="23"/>
                                         <color key="textColor" name="YP White"/>
@@ -102,17 +102,23 @@
                                     </stackView>
                                 </subviews>
                             </stackView>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="omo-or-6uq">
+                                <rect key="frame" x="197" y="438" width="20" height="20"/>
+                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="YP Black"/>
                         <constraints>
+                            <constraint firstItem="omo-or-6uq" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Nzo-py-l8R"/>
                             <constraint firstItem="S4J-io-gJh" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="V2o-2k-5BO"/>
+                            <constraint firstItem="omo-or-6uq" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="YxH-Az-5h8"/>
                             <constraint firstItem="S4J-io-gJh" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="10" id="ase-hr-U5i"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="S4J-io-gJh" secondAttribute="trailing" constant="20" id="esF-zq-JWJ"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="S4J-io-gJh" secondAttribute="bottom" id="hNd-hg-S2S"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="activityIndicator" destination="omo-or-6uq" id="jMk-Wg-ACS"/>
                         <outlet property="counterLabel" destination="uvE-dO-mj7" id="Ab4-MT-Bou"/>
                         <outlet property="imageView" destination="WRb-eS-FgC" id="ATB-q3-fs0"/>
                         <outlet property="noButton" destination="9lP-ek-72k" id="xTr-mS-znh"/>
