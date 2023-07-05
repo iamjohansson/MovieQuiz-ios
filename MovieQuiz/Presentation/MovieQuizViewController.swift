@@ -31,11 +31,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         questionFactory?.loadData()
         alertPresentation = AlertPresentation(delegate: self)
         statisticService = StatisticServiceImplementation()
-        showLoadingIndicator()
+        activityIndicator.startAnimating()
+        activityIndicator.hidesWhenStopped = true
     }
     
     func didLoadDataFromServer() {
-        hideLoadingIndicator()
+        activityIndicator.stopAnimating()
         questionFactory?.requestNextQuestion()
     }
     
@@ -71,34 +72,26 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         let yourCurrentScore = "Ваш результат: \(correctAnswer)/\(questionAmount)"
         let amountPlayedQuiz = "Количество сыгранных квизов: \(statisticService.gamesCount)"
-        let yourCurrentRecord = "Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) \(statisticService.bestGame.date.dateTimeString)"
+        let yourCurrentRecord = "Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))"
         let averageAccuracy = "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
         
         return "\(yourCurrentScore)\n\(amountPlayedQuiz)\n\(yourCurrentRecord)\n\(averageAccuracy)"
     }
     
     private func showNetworkError(message: String) {
-        hideLoadingIndicator()
+        activityIndicator.stopAnimating()
         
         let model = AlertModel(title: "Ошибка", text: message, buttonText: "Попробовать еще раз?") { [weak self] in
             guard let self = self else { return }
             
             self.currentQuestionIndex = 0
             self.correctAnswer = 0
-            self.questionFactory?.requestNextQuestion()
+            self.questionFactory?.loadData()
         }
         alertPresentation?.showAlert(quiz: model)
     }
     // MARK: - Private Functions
     
-    private func showLoadingIndicator() {
-        activityIndicator.isHidden = false
-        activityIndicator.startAnimating()
-    }
-    private func hideLoadingIndicator() {
-        activityIndicator.isHidden = true
-        activityIndicator.stopAnimating()
-    }
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
             image: UIImage(data: model.image) ?? UIImage(),
@@ -115,6 +108,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         buttonEnable()
+        activityIndicator.startAnimating()
         guard let currentQuestion = currentQuestion else { return }
         if currentQuestion.correctAnswer == isCorrect {
             imageView.layer.borderColor = UIColor.ypGreen.cgColor
@@ -128,6 +122,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.showNextQuestionOrResult()
             self.imageView.layer.borderWidth = 0
             self.buttonEnable()
+            activityIndicator.stopAnimating()
         }
     }
     // Метод для блокировки кнопок, при ожидании перехода к след. вопросу
