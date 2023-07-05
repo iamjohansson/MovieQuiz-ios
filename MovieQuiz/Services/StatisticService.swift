@@ -49,7 +49,7 @@ final class StatisticServiceImplementation: StatisticService {
         }
     }
     
-    //Метод сохранения текущего результата, не забыть вызвать в showAlertMessage!!!
+    //Метод сохранения текущего результата
     
     func store(correct: Int, total: Int) {
         self.correct += correct

@@ -9,6 +9,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private weak var textLabel: UILabel!
     @IBOutlet private weak var noButton: UIButton!
     @IBOutlet private weak var yesButton: UIButton!
+    @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     
     private let feedbackGenerator = UINotificationFeedbackGenerator()
     private var currentQuestionIndex = 0
@@ -26,12 +27,22 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         imageView.layer.cornerRadius = 20
-        questionFactory = QuestionFactory(delegate: self)
-        questionFactory?.requestNextQuestion()
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+        questionFactory?.loadData()
         alertPresentation = AlertPresentation(delegate: self)
         statisticService = StatisticServiceImplementation()
+        activityIndicator.startAnimating()
+        activityIndicator.hidesWhenStopped = true
     }
     
+    func didLoadDataFromServer() {
+        activityIndicator.stopAnimating()
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription)
+    }
     // MARK: - Delegate
     
     func didReceiveNextQuestion(question: QuizQuestion?) {
@@ -61,21 +72,31 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         let yourCurrentScore = "Ваш результат: \(correctAnswer)/\(questionAmount)"
         let amountPlayedQuiz = "Количество сыгранных квизов: \(statisticService.gamesCount)"
-        let yourCurrentRecord = "Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) \(statisticService.bestGame.date.dateTimeString)"
+        let yourCurrentRecord = "Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))"
         let averageAccuracy = "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
         
         return "\(yourCurrentScore)\n\(amountPlayedQuiz)\n\(yourCurrentRecord)\n\(averageAccuracy)"
     }
     
+    private func showNetworkError(message: String) {
+        activityIndicator.stopAnimating()
+        
+        let model = AlertModel(title: "Ошибка", text: message, buttonText: "Попробовать еще раз?") { [weak self] in
+            guard let self = self else { return }
+            
+            self.currentQuestionIndex = 0
+            self.correctAnswer = 0
+            self.questionFactory?.loadData()
+        }
+        alertPresentation?.showAlert(quiz: model)
+    }
     // MARK: - Private Functions
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        let questionStep = QuizStepViewModel(
-            image: UIImage(named: model.image) ?? UIImage(),
+        return QuizStepViewModel(
+            image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionAmount)"
-        )
-        return questionStep
+            questionNumber: "\(currentQuestionIndex + 1)/\(questionAmount)")
     }
     private func show(quiz step: QuizStepViewModel) {
         counterLabel.text = step.questionNumber
@@ -87,6 +108,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         buttonEnable()
+        activityIndicator.startAnimating()
         guard let currentQuestion = currentQuestion else { return }
         if currentQuestion.correctAnswer == isCorrect {
             imageView.layer.borderColor = UIColor.ypGreen.cgColor
@@ -100,6 +122,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.showNextQuestionOrResult()
             self.imageView.layer.borderWidth = 0
             self.buttonEnable()
+            activityIndicator.stopAnimating()
         }
     }
     // Метод для блокировки кнопок, при ожидании перехода к след. вопросу
