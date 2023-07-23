@@ -74,7 +74,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         buttonEnable()
     }
 
-    func buttonEnable() {
+    private func buttonEnable() {
         if imageView.layer.borderWidth >= 1 {
             noButton.isEnabled = false
             yesButton.isEnabled = false

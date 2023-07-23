@@ -28,7 +28,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         viewController?.showNetworkError(message: message)
     }
     
-    func isLastQuestion() -> Bool {
+    private func isLastQuestion() -> Bool {
         currentQuestionIndex == questionAmount - 1
     }
     
@@ -37,11 +37,11 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         correctAnswer = 0
     }
     
-    func switchToNextQuestion() {
+    private func switchToNextQuestion() {
         currentQuestionIndex += 1
     }
     
-    func convert(model: QuizQuestion) -> QuizStepViewModel {
+    private func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
             image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
@@ -56,7 +56,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         showAnswerResult(isCorrect: false)
     }
     
-    func showAnswerResult(isCorrect: Bool) {
+    private func showAnswerResult(isCorrect: Bool) {
         guard let currentQuestion = currentQuestion else { return }
         if currentQuestion.correctAnswer == isCorrect {
             viewController?.showImageViewBorderAndIndicator(isCorrectAnswer: isCorrect)
@@ -82,7 +82,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
     }
     
-    func showNextQuestionOrResult() {
+    private func showNextQuestionOrResult() {
         if self.isLastQuestion() {
             viewController?.showAlertMessage()
         } else {
