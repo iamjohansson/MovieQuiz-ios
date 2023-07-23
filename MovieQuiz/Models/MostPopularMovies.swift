@@ -1,21 +1,27 @@
 import Foundation
 
+protocol Movie {
+    var title: String { get }
+    var rating: String { get }
+    var imageURL: URL { get }
+}
+
 struct MostPopularMovies: Codable {
     let errorMessage: String
     let items: [MostPopularMovie]
 }
 
-struct MostPopularMovie: Codable {
+struct MostPopularMovie: Codable, Movie {
     let title: String
     let rating: String
-    let imageURL: URL
+    let previewURL: URL
     
-    var resizedImageUrl: URL {
-        let urlString = imageURL.absoluteString
+    var imageURL: URL {
+        let urlString = previewURL.absoluteString
         let imageUrlString = urlString.components(separatedBy: "._")[0] + "._V0_UX600_.jpg"
         
         guard let newURL = URL(string: imageUrlString) else {
-            return imageURL
+            return self.imageURL
         }
         return newURL
     }
@@ -23,7 +29,7 @@ struct MostPopularMovie: Codable {
     private enum CodingKeys: String, CodingKey {
         case title = "fullTitle"
         case rating = "imDbRating"
-        case imageURL = "image"
+        case previewURL = "image"
     }
     
 }

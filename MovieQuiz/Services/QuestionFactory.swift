@@ -9,7 +9,7 @@ class QuestionFactory: QuestionFactoryProtocol {
         self.delegate = delegate
     }
     
-    private var movies: [MostPopularMovie] = []
+    private var movies: [Movie] = []
     
     func loadData() {
         moviesLoader.loadMovies { [weak self] result in
@@ -17,7 +17,7 @@ class QuestionFactory: QuestionFactoryProtocol {
                 guard let self = self else { return }
                 switch result {
                 case .success(let mostPopularMovies):
-                    self.movies = mostPopularMovies.items
+                    self.movies = mostPopularMovies
                     self.delegate?.didLoadDataFromServer()
                 case .failure(let error):
                     self.delegate?.didFailToLoadData(with: error)
@@ -36,7 +36,7 @@ class QuestionFactory: QuestionFactoryProtocol {
             var imageData = Data()
             
             do {
-                imageData = try Data(contentsOf: movie.resizedImageUrl)
+                imageData = try Data(contentsOf: movie.imageURL)
             } catch {
                 print("Failed to load image")
             }

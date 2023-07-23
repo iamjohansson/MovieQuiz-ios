@@ -1,17 +1,17 @@
 import Foundation
 
 protocol NetworkRouting {
-    func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void)
+    func fetch(request: URLRequest, handler: @escaping (Result<Data, Error>) -> Void)
+}
+
+enum NetworkError: Error {
+    case codeError
+    case brokenRequest
 }
 
 struct NetworkClient: NetworkRouting {
-
-    private enum NetworkError: Error {
-        case codeError
-    }
     
-    func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void) {
-        let request = URLRequest(url: url)
+    func fetch(request: URLRequest, handler: @escaping (Result<Data, Error>) -> Void) {
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
@@ -37,7 +37,7 @@ struct StubNetworkClient: NetworkRouting {
     }
     let emulateError: Bool
     
-    func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void) {
+    func fetch(request: URLRequest, handler: @escaping (Result<Data, Error>) -> Void) {
         if emulateError {
             handler(.failure(TestError.test))
         } else {
