@@ -10,7 +10,7 @@ protocol MoviesLoading {
 }
 
 class MoviesLoader: MoviesLoading {
-
+    // Помощники, которые позволяют пользоваться разными api
     var api: ApiType = .imdb
     private lazy var requestFactory: MoviesRequestFactoryProtocol = MoviesRequestFactory()
     private lazy var responceHandler: MoviesResponceHandlerProtocol = MoviesResponceHandler()

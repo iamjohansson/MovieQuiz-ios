@@ -6,4 +6,5 @@ protocol MovieQuizViewControllerProtocol: AnyObject {
     func show(quiz step: QuizStepViewModel)
     func showImageViewBorderAndIndicator(isCorrectAnswer: Bool)
     func hideImageViewBorderAndIndicator()
+    func showImageError(message: String)
 }

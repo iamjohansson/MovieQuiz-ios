@@ -1,6 +1,6 @@
 import Foundation
 
-// Хандлер для парса даты на основе api (imdb, kinopoisk) с возвратом массива фильмов
+// Хендлер для парса даты на основе выбранного api (imdb, kinopoisk) с возвратом массива фильмов
 protocol MoviesResponceHandlerProtocol {
     func handlerResponce(_ data: Data, apiType: ApiType) throws -> [Movie]
 }

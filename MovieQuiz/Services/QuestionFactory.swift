@@ -1,5 +1,21 @@
 import Foundation
 
+enum ErrorCase: Error {
+    case different(error: String)
+    case imageError
+}
+
+extension ErrorCase: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+        case.different(let error):
+            return NSLocalizedString(error, comment: "Network error")
+        case.imageError:
+            return NSLocalizedString("Изображение временно недоступно", comment: "Image not available")
+        }
+    }
+}
+
 class QuestionFactory: QuestionFactoryProtocol {
     
     private let moviesLoader: MoviesLoading
@@ -19,7 +35,8 @@ class QuestionFactory: QuestionFactoryProtocol {
                 case .success(let mostPopularMovies):
                     self.movies = mostPopularMovies
                     self.delegate?.didLoadDataFromServer()
-                case .failure(let error):
+                case .failure(_):
+                    let error: Error = ErrorCase.different(error: "Проверьте настройки сети и попробуйте еще раз")
                     self.delegate?.didFailToLoadData(with: error)
                 }
             }
@@ -38,15 +55,21 @@ class QuestionFactory: QuestionFactoryProtocol {
             do {
                 imageData = try Data(contentsOf: movie.imageURL)
             } catch {
-                print("Failed to load image")
+                print("Image not available")
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    let error: Error = ErrorCase.imageError
+                    self.delegate?.didFailToLoadImage(with: error)
+                }
+                return
             }
             
             let rating = Float(movie.rating) ?? 0
-            guard let randomRating = (7...9).randomElement() else { return }
+            let randomRating = round(Float.random(in: 7...9) * 10) / 10
             let valueForQuestion = ["больше", "меньше"]
             guard let moreOrLess = valueForQuestion.randomElement() else { return }
-            let text = "Рейтинг этого фильма \(moreOrLess) чем \(randomRating)?"
-            let correctAnswer: Bool = moreOrLess == "больше" ? rating > Float(randomRating) : rating < Float(randomRating)
+            let text = "Рейтинг этого фильма \(moreOrLess) чем \(randomRating) ?"
+            let correctAnswer: Bool = moreOrLess == "больше" ? rating > randomRating : rating < randomRating
             let question = QuizQuestion(image: imageData, text: text, correctAnswer: correctAnswer)
             
             DispatchQueue.main.async { [weak self] in

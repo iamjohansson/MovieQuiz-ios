@@ -28,6 +28,11 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         viewController?.showNetworkError(message: message)
     }
     
+    func didFailToLoadImage(with error: Error) {
+        let message = error.localizedDescription
+        viewController?.showImageError(message: message)
+    }
+    
     private func isLastQuestion() -> Bool {
         currentQuestionIndex == questionAmount - 1
     }
@@ -41,7 +46,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         currentQuestionIndex += 1
     }
     
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
+    func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
             image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,

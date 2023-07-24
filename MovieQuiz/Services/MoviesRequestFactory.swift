@@ -1,5 +1,6 @@
 import Foundation
 
+// Фактори для запросов к URLSession на основе выбранного api (imdb, kinopoisk)
 protocol MoviesRequestFactoryProtocol {
     func constructRequest(apiType: ApiType) -> URLRequest?
 }

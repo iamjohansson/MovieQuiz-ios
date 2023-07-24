@@ -1,7 +1,7 @@
 import UIKit
 
 final class AlertPresentation: AlertPresentationProtocol {
-    // Инъекция контроллера инициализатором
+    
     private weak var delegate: UIViewController?
     
     init(delegate: UIViewController? = nil) {

@@ -45,11 +45,24 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     func showNetworkError(message: String) {
         activityIndicator.stopAnimating()
         
-        let model = AlertModel(title: "Ошибка", text: message, buttonText: "Попробовать еще раз?") { [weak self] in
+        let model = AlertModel(title: "Ошибка загрузки игры", text: message, buttonText: "Попробовать еще раз?") { [weak self] in
             guard let self = self else { return }
             
             self.presenter.restartGame()
             self.presenter.questionFactory?.loadData()
+        }
+        alertPresentation?.showAlert(quiz: model)
+    }
+    
+    func showImageError(message: String) {
+        activityIndicator.stopAnimating()
+        
+        let model = AlertModel(title: "Ошибка", text: message, buttonText: "Обновить!") {
+            [weak self] in
+            guard let self = self else { return }
+            
+            self.presenter.restartGame()
+            self.presenter.questionFactory?.requestNextQuestion()
         }
         alertPresentation?.showAlert(quiz: model)
     }

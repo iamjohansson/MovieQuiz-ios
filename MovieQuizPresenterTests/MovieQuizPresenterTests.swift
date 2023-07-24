@@ -2,6 +2,9 @@ import XCTest
 @testable import MovieQuiz
 
 final class MovieQuizViewControllerMock: MovieQuizViewControllerProtocol {
+    func showImageError(message: String) {
+    }
+    
     func showAlertMessage() {
     }
 
