@@ -9,9 +9,11 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     let statisticService: StatisticService!
     var currentQuestion: QuizQuestion?
     var questionFactory: QuestionFactoryProtocol?
+    private var moviesLoading: MoviesLoading
     
     init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController as? MovieQuizViewController
+        self.moviesLoading = MoviesLoader()
         
         statisticService = StatisticServiceImplementation()
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
@@ -94,6 +96,15 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             self.switchToNextQuestion()
             questionFactory?.requestNextQuestion()
         }
+    }
+    
+    func switchApi() -> ApiType {
+        if moviesLoading.api == .imdb {
+            moviesLoading.api = .kp
+        } else {
+            moviesLoading.api = .imdb
+        }
+        return moviesLoading.api
     }
     
     func alertText() -> String {

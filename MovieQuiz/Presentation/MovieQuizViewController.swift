@@ -10,6 +10,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     @IBOutlet private weak var noButton: UIButton!
     @IBOutlet private weak var yesButton: UIButton!
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet private weak var apiButton: UIButton!
     
     private let feedbackGenerator = UINotificationFeedbackGenerator()
     private var presenter: MovieQuizPresenter!
@@ -48,6 +49,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         let model = AlertModel(title: "Ошибка загрузки игры", text: message, buttonText: "Попробовать еще раз?") { [weak self] in
             guard let self = self else { return }
             
+            self.switchImageAndApi()
             self.presenter.restartGame()
             self.presenter.questionFactory?.loadData()
         }
@@ -100,6 +102,14 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         activityIndicator.stopAnimating()
     }
     
+    private func switchImageAndApi() {
+        if presenter.switchApi() == .imdb {
+            apiButton.setImage(UIImage(named: "imdbImage"), for: .normal)
+        } else {
+            apiButton.setImage(UIImage(named: "kpImage"), for: .normal)
+        }
+    }
+    
     // MARK: - Actions
     @IBAction private func yesButtonClicked(_ sender: Any) {
         presenter.yesButtonClicked()
@@ -108,6 +118,19 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     @IBAction private func noButtonClicked(_ sender: Any) {
         presenter.noButtonClicked()
         feedbackGenerator.notificationOccurred(.success)
+    }
+    
+    @IBAction private func apiButtonClicked(_ sender: Any) {
+        activityIndicator.stopAnimating()
+        
+        let alert = UIAlertController(title: nil, message: "Вы хотите сменить текущий Api?", preferredStyle: .actionSheet)
+        let action = UIAlertAction(title: "Сменить", style: .default) { _ in
+            alert.dismiss(animated: true)
+            self.switchImageAndApi()
+            self.presenter.questionFactory?.loadData()
+        }
+        alert.addAction(action)
+        present(alert, animated: true)
     }
 }
 
