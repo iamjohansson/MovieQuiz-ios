@@ -6,11 +6,11 @@ final class StatisticServiceImplementation: StatisticService {
         case correct, total, bestGame, gamesCount
     }
     private let userDefaults = UserDefaults.standard
-    // Вычисляем процент делением одного числа на другое и умножением на 100 + приводим инты к даблу
+    
     var totalAccuracy: Double {
         (Double(correct) / Double(total)) * 100
     }
-    // Геттируем и сеттируем все переменные
+   
     var gamesCount: Int {
         get {
             userDefaults.integer(forKey: Keys.gamesCount.rawValue)
